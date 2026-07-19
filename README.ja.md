@@ -8,6 +8,14 @@ pico-face は、バックグラウンドで AI エージェントが動いてい
 
 [English README](README.md)
 
+![pico working](docs/shot-working.png)
+
+| おへんじ待ち ❗ | なでたとき 💗 |
+|---|---|
+| ![waiting](docs/shot-waiting.png) | ![heart](docs/shot-heart.png) |
+| **タスク完了えっへん 😤** | **サービス落ちた ＞＜** |
+| ![proud](docs/shot-proud.png) | ![trouble](docs/shot-trouble.png) |
+
 - **光る目と9つの表情** — ひま😪 / 作業中✨ / おへんじ待ち❗ / えっへん😤 /
   あつい🥵 / 枠ピンチ💦 / トラブル＞＜ / おやすみ😴 / なでるとハート目💗
 - **なつき度（たまごっち）** — 毎日なでて、いっしょにタスクをこなすと

@@ -9,6 +9,14 @@ face, not with a dashboard.
 
 [日本語 README](README.ja.md)
 
+![pico working](docs/shot-working.png)
+
+| waiting for your reply ❗ | pet it 💗 |
+|---|---|
+| ![waiting](docs/shot-waiting.png) | ![heart](docs/shot-heart.png) |
+| **task done, proud 😤** | **a service is down ＞＜** |
+| ![proud](docs/shot-proud.png) | ![trouble](docs/shot-trouble.png) |
+
 - **Glowing eyes, 9 moods** — idle 😪 / working ✨ / waiting-for-your-reply ❗ /
   proud 😤 / overheating 🥵 / usage-limit sweat 💦 / trouble ＞＜ / sleeping 😴 /
   heart eyes 💗 when you pet it

@@ -561,7 +561,7 @@ function render() {
   setFace(m);
   if (Date.now() < tempMsgUntil) { strip(s); return; }
   let msg = pickMsg(m);
-  if (m === "trouble") msg = `${T.msg.trouble[0]} (${s.bad_services.join(", ")})`;
+  if (m === "trouble") msg = T.msg.trouble[0] + (s.bad_services.length ? ` (${s.bad_services.join(", ")})` : "");
   else if (m === "hot" && s.cpu_temp) msg = T.hotFmt(s.cpu_temp);
   else if (m === "working" && s.claude?.working > 0)
     msg += T.workingFmt(s.claude.working, s.claude.waiting);
