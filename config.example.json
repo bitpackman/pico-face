@@ -1,0 +1,28 @@
+{
+  "name": "pico",
+  "lang": "en",
+  "port": 8090,
+
+  "services": [
+    { "name": "my-agent",  "type": "systemd-user", "target": "my-agent.service" },
+    { "name": "my-daemon", "type": "launchd",      "target": "com.example.mydaemon" },
+    { "name": "ollama",    "type": "process",      "target": "ollama serve" }
+  ],
+
+  "tasks_dir": null,
+
+  "claude_usage": true,
+  "claude_sessions": true,
+  "session_pattern": "--sdk-url",
+  "credentials_path": "~/.claude/.credentials.json",
+
+  "hot_temp_c": 78,
+  "sweat_usage_pct": 85,
+  "night_hours": [1, 7],
+
+  "pets_per_day": 20,
+  "pet_gain": 1.0,
+  "greeting_bonus": 2.0,
+  "task_gain": 5.0,
+  "neglect_decay": 3.0
+}

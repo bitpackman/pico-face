@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- launchd agent (macOS)
+     Install:
+       sed "s|__HOME__|$HOME|g" deploy/com.picoface.server.plist > ~/Library/LaunchAgents/com.picoface.server.plist
+       launchctl load ~/Library/LaunchAgents/com.picoface.server.plist
+     Uninstall:
+       launchctl unload ~/Library/LaunchAgents/com.picoface.server.plist
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.picoface.server</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/usr/bin/python3</string>
+    <string>__HOME__/pico-face/server.py</string>
+  </array>
+  <key>WorkingDirectory</key>
+  <string>__HOME__/pico-face</string>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>/tmp/pico-face.log</string>
+  <key>StandardErrorPath</key>
+  <string>/tmp/pico-face.log</string>
+</dict>
+</plist>

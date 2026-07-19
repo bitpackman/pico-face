@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0e14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<link rel="icon" type="image/png" href="/icon-192.png">
+<title>pico-face</title>
+<style>
+  :root {
+    --bg: #0a0e14;
+    --eye: #6ee7ff;
+    --glow: rgba(110, 231, 255, .55);
+    --cheek: rgba(255, 140, 180, .35);
+    --dim: #3a4a5a;
+    --ok: #4ade80;
+    --bad: #f87171;
+  }
+  body.sweat    { --eye: #ffd76e; --glow: rgba(255, 215, 110, .5); }
+  body.trouble  { --eye: #ff8080; --glow: rgba(255, 128, 128, .5); }
+  body.idle     { --eye: #8fd4ee; --glow: rgba(143, 212, 238, .35); }
+  body.sleeping { --eye: #5a7a8f; --glow: rgba(90, 122, 143, .2); }
+  body.hot      { --eye: #ff9d5c; --glow: rgba(255, 157, 92, .5); }
+  body.proud    { --eye: #7effc4; --glow: rgba(126, 255, 196, .5); }
+  body.heart    { --eye: #ff7eb3; --glow: rgba(255, 126, 179, .55); }
+  body.waiting  { --eye: #c9a8ff; --glow: rgba(201, 168, 255, .5); }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: radial-gradient(ellipse at 50% 40%, #101826 0%, var(--bg) 70%);
+    font-family: "Noto Sans Mono", ui-monospace, monospace;
+    color: var(--dim);
+    overflow: hidden;
+    cursor: none;
+  }
+
+  /* ---- face ---------------------------------------------------- */
+  #face {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    gap: 9vmin;
+    animation: breathe 4s ease-in-out infinite;
+  }
+  @keyframes breathe { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-1.2vmin) } }
+
+  .eye {
+    position: relative;
+    width: 17vmin; height: 21vmin;
+    background: var(--eye);
+    border-radius: 45% 45% 48% 48%;
+    box-shadow: 0 0 8vmin var(--glow), 0 0 2vmin var(--glow);
+    transition: height .35s cubic-bezier(.34,1.56,.64,1), border-radius .35s, transform .35s, translate .5s ease;
+  }
+  .eye::before {
+    content: ""; position: absolute;
+    top: 14%; left: 16%;
+    width: 34%; height: 26%;
+    background: #fff; border-radius: 50%;
+    opacity: .95;
+  }
+  .eye::after {
+    content: ""; position: absolute;
+    top: 52%; left: 58%;
+    width: 14%; height: 11%;
+    background: #fff; border-radius: 50%;
+    opacity: .8;
+  }
+
+  .cheek {
+    position: absolute; top: 62%;
+    width: 9vmin; height: 5vmin;
+    background: var(--cheek);
+    border-radius: 50%;
+    filter: blur(1.2vmin);
+    transition: opacity .5s;
+  }
+  #cheekL { left: 22%; } #cheekR { right: 22%; }
+
+  #mouth {
+    position: absolute; left: 50%; top: 63%;
+    width: 7vmin; height: 3.4vmin;
+    transform: translateX(-50%);
+    border: .9vmin solid var(--eye);
+    border-top: none;
+    border-radius: 0 0 7vmin 7vmin;
+    transition: all .35s;
+  }
+
+  #sweatdrop {
+    position: absolute; top: 24%; right: 26%;
+    width: 3.4vmin; height: 4.6vmin;
+    background: #9fdcff;
+    border-radius: 50% 50% 60% 60% / 20% 20% 80% 80%;
+    opacity: 0;
+  }
+  #sweatdrop2 {
+    position: absolute; top: 26%; left: 26%;
+    width: 3vmin; height: 4.2vmin;
+    background: #9fdcff;
+    border-radius: 50% 50% 60% 60% / 20% 20% 80% 80%;
+    opacity: 0;
+  }
+  #zzz {
+    position: absolute; top: 20%; right: 24%;
+    font-size: 5vmin; color: var(--dim); opacity: 0;
+    letter-spacing: .4vmin;
+  }
+
+  /* ---- moods --------------------------------------------------- */
+  body.idle .eye { height: 6vmin; border-radius: 3vmin 3vmin 5vmin 5vmin; }
+  body.idle .eye::before, body.idle .eye::after { opacity: 0; }
+  body.idle #mouth { width: 4vmin; height: 2vmin; }
+  body.idle #zzz { opacity: 1; animation: floatz 3.2s ease-in-out infinite; }
+  body.idle .cheek { opacity: .5; }
+  @keyframes floatz { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-2vmin) } }
+
+  body.working #face { animation: breathe 2.6s ease-in-out infinite; }
+  body.working .cheek { opacity: 1; }
+
+  body.sweat #eyeL { transform: rotate(8deg); height: 15vmin; }
+  body.sweat #eyeR { transform: rotate(-8deg); height: 15vmin; }
+  body.sweat #mouth { width: 4.5vmin; height: 4vmin; border-radius: 4vmin 4vmin 0 0; border-bottom: none; border-top: .9vmin solid var(--eye); }
+  body.sweat #sweatdrop { opacity: .95; animation: drip 1.4s ease-in infinite; }
+  @keyframes drip { 0% { transform: translateY(0) } 75% { transform: translateY(5vmin); opacity: .95 } 100% { transform: translateY(6vmin); opacity: 0 } }
+
+  body.trouble .eye { height: 3vmin; border-radius: 2vmin; }
+  body.trouble .eye::before, body.trouble .eye::after { opacity: 0; }
+  body.trouble #eyeL { transform: rotate(-18deg); }
+  body.trouble #eyeR { transform: rotate(18deg); }
+  body.trouble #mouth { width: 5vmin; height: 4.5vmin; border-radius: 5vmin 5vmin 0 0; border-bottom: none; border-top: .9vmin solid var(--eye); }
+  body.trouble #face { animation: wobble .5s ease-in-out infinite; }
+  @keyframes wobble { 0%,100% { transform: rotate(-1.5deg) } 50% { transform: rotate(1.5deg) } }
+
+  body.sleeping .eye { height: 1.8vmin; border-radius: 1vmin; }
+  body.sleeping .eye::before, body.sleeping .eye::after { opacity: 0; }
+  body.sleeping #mouth { width: 3vmin; height: 1.4vmin; }
+  body.sleeping #zzz { opacity: 1; font-size: 7vmin; animation: floatz 4.5s ease-in-out infinite; }
+  body.sleeping #face { animation: breathe 6.5s ease-in-out infinite; }
+  body.sleeping #dim { opacity: .45; }
+  #dim { position: fixed; inset: 0; background: #000; opacity: 0; transition: opacity 2s; pointer-events: none; z-index: 9; }
+
+  body.hot .eye { height: 7vmin; border-radius: 3vmin; }
+  body.hot .eye::before { opacity: .4; } body.hot .eye::after { opacity: 0; }
+  body.hot #mouth { width: 4.5vmin; height: 4.5vmin; border: .9vmin solid var(--eye); border-radius: 50%; }
+  body.hot #sweatdrop { opacity: .95; animation: drip 1.1s ease-in infinite; }
+  body.hot #sweatdrop2 { opacity: .95; animation: drip 1.3s ease-in .4s infinite; }
+
+  body.proud .eye { height: 6vmin; border-radius: 8vmin 8vmin 1.5vmin 1.5vmin; }
+  body.proud .eye::before, body.proud .eye::after { opacity: 0; }
+  body.proud #mouth { width: 9vmin; height: 4.5vmin; }
+  body.proud .cheek { opacity: 1; }
+  body.proud #face { animation: hop 1.1s ease-in-out infinite; }
+  @keyframes hop { 0%,100% { transform: translateY(0) } 30% { transform: translateY(-3vmin) } 55% { transform: translateY(0) } }
+
+  body.heart .eye { background: transparent; box-shadow: none; }
+  body.heart .eye::before, body.heart .eye::after { opacity: 0; }
+  .heartshape { display: none; position: absolute; left: 50%; top: 45%; width: 9vmin; height: 9vmin; margin: -4.5vmin; background: var(--eye); transform: rotate(45deg); box-shadow: 0 0 6vmin var(--glow); }
+  .heartshape::before, .heartshape::after { content: ""; position: absolute; width: 9vmin; height: 9vmin; border-radius: 50%; background: var(--eye); }
+  .heartshape::before { left: -4.5vmin; }
+  .heartshape::after { top: -4.5vmin; }
+  body.heart .heartshape { display: block; animation: beat .55s ease-in-out infinite; }
+  @keyframes beat { 50% { transform: rotate(45deg) scale(1.18) } }
+  body.heart #mouth { width: 8vmin; height: 4vmin; }
+  body.heart .cheek { opacity: 1; }
+
+  body.waiting #face { animation: tilt 3s ease-in-out infinite; }
+  @keyframes tilt { 0%,100% { transform: rotate(0) } 50% { transform: rotate(4deg) translateY(-1vmin) } }
+  body.waiting #notice { opacity: 1; animation: bounce .9s ease-in-out infinite; }
+  #notice { position: absolute; top: 16%; right: 22%; font-size: 9vmin; color: #c9a8ff; opacity: 0; transition: opacity .4s; text-shadow: 0 0 3vmin rgba(201,168,255,.6); }
+  @keyframes bounce { 0%,100% { transform: translateY(0) } 40% { transform: translateY(-2.5vmin) } }
+  body.waiting .cheek { opacity: .6; }
+
+  /* ---- micro-events -------------------------------------------- */
+  body.ev-wiggle #face { animation: wiggle .5s ease-in-out 2; }
+  @keyframes wiggle { 0%,100% { transform: rotate(0) } 25% { transform: rotate(-3deg) } 75% { transform: rotate(3deg) } }
+  body.ev-sigh #face { animation: sighdown 2s ease-in-out 1; }
+  @keyframes sighdown { 0%,100% { transform: translateY(0) } 35%,75% { transform: translateY(2.5vmin) } }
+  body.ev-sneeze #face { animation: sneeze .8s ease-in-out 1; }
+  @keyframes sneeze { 0% { transform: scale(1) } 30% { transform: scale(1.06,.92) } 50% { transform: scale(.9,1.1) translateY(-2.5vmin) } 70% { transform: scale(1.03,.97) } 100% { transform: scale(1) } }
+  body.ev-daydream .eye { translate: 0 -2vmin; }
+
+  /* whim: daily personality tempo */
+  body.w-mattari.idle #face, body.w-mattari.waiting #face { animation-duration: 7s; }
+  body.w-harikiri.idle #face, body.w-harikiri.waiting #face { animation-duration: 2.2s; }
+  body.w-amaenbo .cheek { opacity: .7; }
+
+  /* affection level perks */
+  body.af3 .cheek { opacity: .85; }
+  body.af5 .eye::before { width: 40%; height: 31%; }
+  body.af7 #face { filter: drop-shadow(0 0 5vmin rgba(255, 205, 120, .35)); }
+
+  .float-heart {
+    position: fixed; color: #ff7eb3;
+    font-size: 4.5vmin; pointer-events: none; z-index: 20;
+    animation: floatup 1.2s ease-out forwards;
+  }
+  @keyframes floatup { to { transform: translateY(-16vmin); opacity: 0; } }
+
+  .blink .eye { height: 1.6vmin !important; border-radius: 1vmin !important; }
+  .blink .eye::before, .blink .eye::after { opacity: 0; }
+
+  /* ---- text & strip -------------------------------------------- */
+  #msg {
+    position: fixed; top: 4%; width: 100%;
+    text-align: center;
+    font-size: clamp(13px, 2.2vmin, 22px);
+    color: var(--dim);
+  }
+  #aff {
+    position: fixed; top: calc(4% + 2.4em); width: 100%;
+    text-align: center;
+    font-size: clamp(11px, 1.8vmin, 16px);
+    color: var(--dim);
+  }
+  #aff .bar { width: 5.5em; }
+  #aff .bar i { background: #ff7eb3; }
+  #strip {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    display: flex; gap: 2.2em; align-items: center; justify-content: center;
+    flex-wrap: wrap;
+    padding: 1em; font-size: clamp(11px, 1.6vw, 16px);
+  }
+  .dot { display: inline-block; width: .7em; height: .7em; border-radius: 50%; margin-right: .35em; background: var(--dim); }
+  .dot.active { background: var(--ok); }
+  .dot.bad { background: var(--bad); animation: pulse 1s infinite; }
+  @keyframes pulse { 50% { opacity: .3 } }
+  .bar { display: inline-block; width: 7em; height: .6em; background: #1c2530; border-radius: .3em; overflow: hidden; vertical-align: middle; margin: 0 .4em; }
+  .bar i { display: block; height: 100%; background: var(--ok); width: 0; transition: width .6s; }
+  .bar i.hot { background: var(--bad); }
+
+  @media (max-width: 640px) {
+    body { cursor: auto; }
+    #face { gap: 7vmin; }
+    #strip { gap: .8em 1.4em; padding: .8em .6em calc(.8em + env(safe-area-inset-bottom)); font-size: 12px; }
+    .bar { width: 4.5em; }
+    #msg { top: calc(3% + env(safe-area-inset-top)); }
+  }
+
+  #snd {
+    position: fixed; right: .9em; bottom: 3.2em; z-index: 30;
+    background: none; border: none; font-size: 1.3em;
+    color: var(--dim); opacity: .5; cursor: pointer;
+  }
+</style>
+</head>
+<body class="idle">
+
+<div id="face">
+  <div class="eye" id="eyeL"><div class="heartshape"></div></div>
+  <div class="eye" id="eyeR"><div class="heartshape"></div></div>
+</div>
+<div class="cheek" id="cheekL"></div>
+<div class="cheek" id="cheekR"></div>
+<div id="mouth"></div>
+<div id="sweatdrop"></div>
+<div id="sweatdrop2"></div>
+<div id="zzz">z z Z</div>
+<div id="notice">❗</div>
+<div id="dim"></div>
+
+<div id="msg"></div>
+<div id="aff"></div>
+<div id="strip"></div>
+<button id="snd" title="sound">🔊</button>
+
+<script>
+// ---- i18n ----
+const I18N = {
+  ja: {
+    msg: {
+      idle: ["ひまです… おしごとください", "ぼーっとしてます…", "なにかおてつだい、ありますか？", "きょうもへいわです", "ふんふんふ〜ん♪"],
+      working: ["がんばってます！", "カタカタカタ…", "しゅうちゅう中…！", "うでのみせどころです！"],
+      sweat: ["枠がもうすぐ上限…！", "ちょっとつかいすぎかも…！"],
+      trouble: ["たすけて！サービスが落ちてます"],
+      sleeping: ["おやすみなさい……", "すぅ…… すぅ……", "むにゃ…"],
+      hot: ["あつい…！とけちゃう〜"],
+      proud: ["おしごと完了！えっへん", "どうだ！やりました！", "ほめてほめて！"],
+      heart: ["えへへ、だいすき！", "わ〜い！", "もっとなでて！"],
+      waiting: ["おへんじまってます！", "ねぇねぇ、みてみて！", "できたとおもうんだけど、どうかな？"],
+    },
+    rare: {
+      idle: ["…きょうもいっしょにがんばろうね", "（じつは あなたのこと みてました）"],
+      working: ["これがおわったら ほめてくださいね", "むずかしいけど まけないぞ…！"],
+      heart: ["ずっといっしょにいようね"],
+      waiting: ["はやくみてほしいなぁ…そわそわ"],
+    },
+    tereyaHeart: ["て、てれるよぉ…！", "〜〜〜っ！//"],
+    levels: ["はじめまして", "かおみしり", "ともだち", "なかよし", "しんゆう", "かぞく", "あいぼう", "ずっといっしょ"],
+    whims: { harikiri: "はりきり", mattari: "まったり", amaenbo: "あまえんぼう", ochame: "おちゃめ", tereya: "てれや" },
+    greeting: h => (h < 5 ? "こんばんは" : h < 11 ? "おはよう！" : h < 18 ? "こんにちは！" : "こんばんは！"),
+    hello: (g, name) => `${g} ${name}だよ`,
+    okaeri: "おかえりなさい！まってたよ！",
+    levelup: n => `レベルアップ！「${n}」になりました！`,
+    affLine: (name, lv, lvName) => `${name}のなつき度 Lv.${lv}「${lvName}」`,
+    kibun: n => `　きょうのきぶん：${n}`,
+    hotFmt: t => `あつい…！とけちゃう〜（${t}°C）`,
+    workingFmt: (w, wa) => `（作業中${w}${wa ? `・返事待ち${wa}` : ""}）`,
+    waitingFmt: n => `（${n}セッション）`,
+    claudeStrip: c => `Claude 作業${c.working}・待ち${c.waiting}・計${c.sessions}`,
+    five: "5h枠", week: "週", queueFmt: t => `キュー ${t.queue} / 実行 ${t.running}`,
+    watching: "👀 そばにいる", away: "…おるすばん",
+    connectErr: "status server に接続できません",
+    sigh: "ふぅ…", sneezeMsg: "……くしゅんっ！", dream: "……♪", ehehe: "……えへへ", chira: "……（ちらっ）",
+  },
+  en: {
+    msg: {
+      idle: ["I'm bored... got any work for me?", "just chilling...", "anything I can help with?", "all quiet today", "hmm hmm hm~ ♪"],
+      working: ["working hard!", "tak tak tak...", "focusing...!", "watch me go!"],
+      sweat: ["usage window almost full...!", "we might be overdoing it...!"],
+      trouble: ["help! a service is down"],
+      sleeping: ["good night......", "zzz... zzz...", "mnya..."],
+      hot: ["so hot...! I'm melting~"],
+      proud: ["task done! ta-da!", "nailed it!", "praise me please!"],
+      heart: ["hehe, I like you!", "yay!", "pet me more!"],
+      waiting: ["waiting for your reply!", "hey, come look!", "I think it's done — what do you say?"],
+    },
+    rare: {
+      idle: ["...let's do our best together today", "(I was secretly watching you)"],
+      working: ["praise me when this is done, okay?", "it's hard but I won't give up...!"],
+      heart: ["let's stay together forever"],
+      waiting: ["I really want you to see this... fidget fidget"],
+    },
+    tereyaHeart: ["y-you're making me blush...!", "~~~!!"],
+    levels: ["stranger", "acquaintance", "friend", "buddy", "close friend", "family", "partner", "forever"],
+    whims: { harikiri: "energetic", mattari: "laid-back", amaenbo: "clingy", ochame: "silly", tereya: "shy" },
+    greeting: h => (h < 5 ? "Good evening" : h < 11 ? "Good morning!" : h < 18 ? "Hello!" : "Good evening!"),
+    hello: (g, name) => `${g} I'm ${name}!`,
+    okaeri: "Welcome back! I missed you!",
+    levelup: n => `Level up! We're now "${n}"!`,
+    affLine: (name, lv, lvName) => `${name}'s bond Lv.${lv} "${lvName}"`,
+    kibun: n => `  today's mood: ${n}`,
+    hotFmt: t => `so hot...! melting~ (${t}°C)`,
+    workingFmt: (w, wa) => ` (${w} working${wa ? `, ${wa} awaiting reply` : ""})`,
+    waitingFmt: n => ` (${n} session${n > 1 ? "s" : ""})`,
+    claudeStrip: c => `Claude ${c.working} working / ${c.waiting} waiting / ${c.sessions} total`,
+    five: "5h", week: "7d", queueFmt: t => `queue ${t.queue} / running ${t.running}`,
+    watching: "👀 with you", away: "...away",
+    connectErr: "cannot reach status server",
+    sigh: "phew...", sneezeMsg: "...achoo!", dream: "...♪", ehehe: "...hehe", chira: "...(glance)",
+  },
+};
+let UI = { name: "pico", lang: "en" };
+let T = I18N.en;
+
+// ---- sounds (Web Audio chiptune) ----
+let audioCtx = null;
+let soundOn = localStorage.getItem("pf-sound") !== "off";
+
+function ensureAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === "suspended") audioCtx.resume();
+}
+function beep(freq, dur, delay = 0, vol = 0.08) {
+  if (!soundOn || !audioCtx) return;
+  const t = audioCtx.currentTime + delay;
+  const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+  o.type = "square";
+  o.frequency.value = freq;
+  g.gain.setValueAtTime(vol, t);
+  g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+  o.connect(g).connect(audioCtx.destination);
+  o.start(t); o.stop(t + dur + 0.02);
+}
+const sndPet     = () => { beep(880, .07); beep(1318, .1, .07); };
+const sndLevelup = () => [523, 659, 784, 1047, 1318].forEach((f, i) => beep(f, .12, i * .1, .1));
+const sndOkaeri  = () => { beep(659, .1); beep(880, .1, .12); beep(1047, .18, .24); };
+const sndSneeze  = () => beep(220, .12, 0, .06);
+
+const sndBtn = document.querySelector("#snd");
+sndBtn.textContent = soundOn ? "🔊" : "🔇";
+sndBtn.addEventListener("click", ev => {
+  ev.stopPropagation();
+  soundOn = !soundOn;
+  localStorage.setItem("pf-sound", soundOn ? "on" : "off");
+  sndBtn.textContent = soundOn ? "🔊" : "🔇";
+  if (soundOn) { ensureAudio(); sndPet(); }
+});
+
+const EYES_CLOSED = ["idle", "trouble", "sleeping", "proud", "heart"];
+
+// messages rotate every 25s within a mood
+let msgCache = { mood: null, text: "", t: 0 };
+function pickMsg(m) {
+  const now = Date.now();
+  if (msgCache.mood === m && now - msgCache.t < 25000) return msgCache.text;
+  const rare = T.rare[m];
+  const pool = (rare && Math.random() < 0.1) ? rare : T.msg[m];
+  msgCache = { mood: m, t: now, text: pool[Math.floor(Math.random() * pool.length)] };
+  return msgCache.text;
+}
+
+// transient line (sneeze etc.); render() restores after it expires
+let tempMsgUntil = 0;
+function tempMsg(text, ms = 2200) {
+  tempMsgUntil = Date.now() + ms;
+  document.getElementById("msg").textContent = text;
+  setTimeout(render, ms + 50);
+}
+
+let mood = "idle";
+let afLevel = 1;
+let whim = null;
+let evClass = null;
+
+function setFace(m) {
+  mood = m;
+  const cls = [m];
+  if (afLevel >= 3) cls.push("af3");
+  if (afLevel >= 5) cls.push("af5");
+  if (afLevel >= 7) cls.push("af7");
+  if (whim) cls.push("w-" + whim);
+  if (evClass) cls.push(evClass);
+  document.body.className = cls.join(" ");
+}
+
+// blink (not when lids are already down / heart eyes)
+setInterval(() => {
+  if (EYES_CLOSED.includes(mood)) return;
+  document.body.classList.add("blink");
+  setTimeout(() => document.body.classList.remove("blink"), 140);
+  if (Math.random() < 0.3) {
+    setTimeout(() => document.body.classList.add("blink"), 280);
+    setTimeout(() => document.body.classList.remove("blink"), 420);
+  }
+}, 3800);
+
+// glance around while working
+setInterval(() => {
+  if (mood !== "working") return;
+  const dx = (Math.random() - 0.5) * 5;
+  const dy = (Math.random() - 0.5) * 2.5;
+  document.querySelectorAll(".eye").forEach(e =>
+    e.style.translate = `${dx}vmin ${dy}vmin`);
+  setTimeout(() => document.querySelectorAll(".eye").forEach(e =>
+    e.style.translate = "0 0"), 900);
+}, 2600);
+
+// ---- whim engine: occasional small gestures ----
+function glance() {
+  const dx = (Math.random() < 0.5 ? -1 : 1) * 3.5;
+  document.querySelectorAll(".eye").forEach(e => e.style.translate = `${dx}vmin 0`);
+  setTimeout(() => document.querySelectorAll(".eye").forEach(e => e.style.translate = "0 0"), 1300);
+}
+
+function runEvent(cls, ms, after) {
+  evClass = cls;
+  setFace(mood);
+  setTimeout(() => { evClass = null; setFace(mood); if (after) after(); }, ms);
+}
+
+function microEvent() {
+  if (tapMood || mood === "sleeping" || mood === "trouble") return;
+  const pool = ["glance", "glance", "wiggle", "sigh"];
+  if (whim === "ochame") pool.push("sneeze", "wiggle", "sneeze");
+  if (whim === "amaenbo" && afLevel >= 3) pool.push("love", "love");
+  if (whim === "tereya") pool.push("shy");
+  if (mood === "idle") pool.push("daydream");
+  const ev = pool[Math.floor(Math.random() * pool.length)];
+  if (ev === "glance") glance();
+  else if (ev === "wiggle") runEvent("ev-wiggle", 1100);
+  else if (ev === "sigh") { runEvent("ev-sigh", 2100); tempMsg(T.sigh); }
+  else if (ev === "sneeze") { runEvent("ev-sneeze", 900); tempMsg(T.sneezeMsg); sndSneeze(); }
+  else if (ev === "daydream") { runEvent("ev-daydream", 2600); tempMsg(T.dream); }
+  else if (ev === "love") {
+    floatHeart(innerWidth * (0.35 + Math.random() * 0.3), innerHeight * 0.35, "♥");
+    tempMsg(T.ehehe);
+  }
+  else if (ev === "shy") { glance(); tempMsg(T.chira); }
+}
+
+function evDelay() {
+  const base = whim === "harikiri" ? 8000 : whim === "mattari" ? 20000
+             : whim === "ochame" ? 9000 : 13000;
+  return base * (0.6 + Math.random() * 0.9);
+}
+(function loopEvents() { setTimeout(() => { microEvent(); loopEvents(); }, evDelay()); })();
+
+// ---- presence: eye tracking & welcome-back (only when camera watcher runs) ----
+let okaeriShown = false;
+setInterval(() => {
+  const p = lastS?.presence;
+  if (!p?.watcher || !p.present || tapMood || mood === "working" || EYES_CLOSED.includes(mood)) return;
+  const dx = (0.5 - p.cx) * 8;  // camera image is mirrored
+  document.querySelectorAll(".eye").forEach(e => e.style.translate = `${dx.toFixed(1)}vmin 0`);
+}, 900);
+
+function welcomeBack() {
+  tempMsg(T.okaeri, 4500);
+  sndOkaeri();
+  for (let i = 0; i < 6; i++)
+    setTimeout(() => floatHeart(innerWidth * (0.3 + Math.random() * 0.4), innerHeight * 0.4, "♥"), i * 150);
+}
+
+function checkOkaeri(s) {
+  const p = s.presence;
+  if (!p) return;
+  if (p.okaeri && !okaeriShown) { okaeriShown = true; welcomeBack(); }
+  else if (!p.okaeri) okaeriShown = false;
+}
+
+// ---- finger following: slide and the eyes chase your finger ----
+let fingerTimer = null;
+addEventListener("pointermove", e => {
+  if (EYES_CLOSED.includes(mood) && mood !== "idle") return;
+  const dx = (e.clientX / innerWidth - 0.5) * 7;
+  const dy = (e.clientY / innerHeight - 0.5) * 3.5;
+  document.querySelectorAll(".eye").forEach(el =>
+    el.style.translate = `${dx.toFixed(1)}vmin ${dy.toFixed(1)}vmin`);
+  clearTimeout(fingerTimer);
+  fingerTimer = setTimeout(() =>
+    document.querySelectorAll(".eye").forEach(el => el.style.translate = "0 0"), 1500);
+});
+
+const SHORT = {};  // optional display-name shortening: {"long-service-name": "short"}
+function strip(s) {
+  const svcHtml = Object.entries(s.services).map(([name, st]) =>
+    `<span><span class="dot ${st === "active" ? "active" : "bad"}"></span>${SHORT[name] || name}</span>`
+  ).join("");
+  const u = s.usage, pct = u?.five_hour_pct;
+  const usageHtml = u == null ? ""
+    : pct == null ? `<span>${T.five} ?</span>`
+    : `<span>${T.five}<span class="bar"><i class="${pct >= 85 ? "hot" : ""}" style="width:${pct}%"></i></span>${pct}%</span>`;
+  const week = u?.seven_day_pct == null ? "" : `<span>${T.week} ${u.seven_day_pct}%</span>`;
+  const cc = s.claude ? `<span>${T.claudeStrip(s.claude)}</span>` : "";
+  const tasks = s.tasks ? `<span>${T.queueFmt(s.tasks)}</span>` : "";
+  const temp = s.cpu_temp == null ? "" : `<span>${s.cpu_temp}°C</span>`;
+  const eye = s.presence?.watcher
+    ? `<span>${s.presence.present ? T.watching : T.away}</span>` : "";
+  document.getElementById("strip").innerHTML = svcHtml + usageHtml + week + cc + tasks + temp + eye;
+}
+
+// preview override: ?mood=idle|working|sweat|trouble|sleeping|hot|proud|heart|waiting
+const forced = new URLSearchParams(location.search).get("mood");
+let tapMood = null, tapTimer = null, lastS = null;
+
+function showAff(a) {
+  if (!a) return;
+  afLevel = a.level;
+  const TH = [0, 10, 25, 45, 70, 100, 140, 190];
+  const span = a.next_at === null ? 1
+    : (a.points - TH[a.level - 1]) / (a.next_at - TH[a.level - 1]);
+  const w = lastS?.whim ? T.kibun(T.whims[lastS.whim.key] || lastS.whim.key) : "";
+  document.getElementById("aff").innerHTML =
+    T.affLine(UI.name, a.level, T.levels[a.level - 1]) +
+    `<span class="bar"><i style="width:${Math.round(span * 100)}%"></i></span>` +
+    `${a.points}pt${w}`;
+}
+
+function render() {
+  if (!lastS) return;
+  const s = lastS;
+  const m = tapMood || forced || s.mood;
+  whim = s.whim?.key || null;
+  showAff(s.affection);
+  setFace(m);
+  if (Date.now() < tempMsgUntil) { strip(s); return; }
+  let msg = pickMsg(m);
+  if (m === "trouble") msg = `${T.msg.trouble[0]} (${s.bad_services.join(", ")})`;
+  else if (m === "hot" && s.cpu_temp) msg = T.hotFmt(s.cpu_temp);
+  else if (m === "working" && s.claude?.working > 0)
+    msg += T.workingFmt(s.claude.working, s.claude.waiting);
+  else if (m === "waiting" && s.claude?.waiting > 0)
+    msg += T.waitingFmt(s.claude.waiting);
+  else if (m === "heart" && whim === "tereya")
+    msg = T.tereyaHeart[Math.floor(Math.random() * T.tereyaHeart.length)];
+  document.getElementById("msg").textContent = msg;
+  strip(s);
+}
+
+function floatHeart(x, y, text) {
+  const el = document.createElement("div");
+  el.className = "float-heart";
+  el.textContent = text;
+  el.style.left = (x - 10) + "px";
+  el.style.top = (y - 20) + "px";
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1300);
+}
+
+function celebrate(lvName) {
+  sndLevelup();
+  for (let i = 0; i < 14; i++) {
+    setTimeout(() => floatHeart(
+      Math.random() * innerWidth, innerHeight * (0.3 + Math.random() * 0.5), "♥"
+    ), i * 90);
+  }
+  document.getElementById("msg").textContent = T.levelup(lvName);
+}
+
+// pet the face -> heart eyes + affection
+addEventListener("pointerdown", async e => {
+  ensureAudio();
+  sndPet();
+  tapMood = "heart";
+  clearTimeout(tapTimer);
+  tapTimer = setTimeout(() => { tapMood = null; render(); }, 2500);
+  render();
+  try {
+    const prevLv = afLevel;
+    const a = await (await fetch("/pet", { method: "POST" })).json();
+    if (lastS) lastS.affection = a;
+    if (a.gain > 0) {
+      floatHeart(e.clientX, e.clientY, `+${a.gain}♥`);
+      if (whim === "amaenbo")
+        setTimeout(() => floatHeart(e.clientX + 30, e.clientY - 10, "♥"), 200);
+    }
+    showAff(a);
+    if (a.level > prevLv) celebrate(T.levels[a.level - 1]);
+    else render();
+  } catch {}
+});
+
+// visit-based welcome back: open the app after a while away
+const OKAERI_GAP_MS = 3 * 60 * 60 * 1000;
+let greeted = false;
+function greet() {
+  if (greeted) return;
+  greeted = true;
+  const last = Number(localStorage.getItem("pf-last-visit") || 0);
+  if (last && Date.now() - last > OKAERI_GAP_MS) { welcomeBack(); return; }
+  const h = new Date().getHours();
+  tempMsg(T.hello(T.greeting(h), UI.name), 3000);
+}
+setInterval(() => localStorage.setItem("pf-last-visit", Date.now()), 30000);
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible") { greeted = false; greet(); }
+  else localStorage.setItem("pf-last-visit", Date.now());
+});
+
+async function tick() {
+  try {
+    lastS = await (await fetch("/status")).json();
+    UI = lastS.ui || UI;
+    T = I18N[UI.lang] || I18N.en;
+    render();
+    greet();
+    checkOkaeri(lastS);
+  } catch {
+    document.getElementById("msg").textContent = T.connectErr;
+  }
+}
+tick();
+setInterval(tick, 5000);
+
+// PWA: register service worker (requires HTTPS or localhost)
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/sw.js").catch(() => {});
+}
+</script>
+</body>
+</html>

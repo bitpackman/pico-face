@@ -1,0 +1,24 @@
+# systemd user service (Linux / Raspberry Pi)
+# Install:
+#   cp deploy/pico-face.service ~/.config/systemd/user/
+#   systemctl --user daemon-reload
+#   systemctl --user enable --now pico-face.service
+#   loginctl enable-linger $USER   # keep it running while logged out
+#
+# Adjust the path below if you cloned somewhere other than ~/pico-face.
+
+[Unit]
+Description=pico-face status server (agent face UI)
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 %h/pico-face/server.py
+WorkingDirectory=%h/pico-face
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target
