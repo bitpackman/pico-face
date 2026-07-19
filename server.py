@@ -36,7 +36,9 @@ DEFAULTS = {
     "tasks_dir": None,          # dir with queue/ running/ done/ failed/ subdirs, or null
     "claude_usage": True,       # show Claude usage windows (unofficial endpoint)
     "claude_sessions": True,    # classify Claude Code sessions by CPU activity
-    "session_pattern": "(^|/)claude( |$)",
+    # matches the claude CLI by name (macOS/interactive) OR the --sdk-url flag
+    # (Linux spawns sessions via a versioned binary that isn't named "claude")
+    "session_pattern": "((^|/)claude( |$)|--sdk-url)",
     "credentials_path": "~/.claude/.credentials.json",
     "hot_temp_c": 78,
     "sweat_usage_pct": 85,

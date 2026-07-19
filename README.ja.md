@@ -67,7 +67,7 @@ launchctl load ~/Library/LaunchAgents/com.picoface.server.plist
 | `tasks_dir` | `null` | `queue/ running/ done/ failed/` を持つディレクトリ（完了タスクがなつき度に加算） |
 | `claude_usage` | `true` | Claude 使用量枠の表示（下記の注意参照） |
 | `claude_sessions` | `true` | Claude Code セッションの CPU ベース分類 |
-| `session_pattern` | `"(^|/)claude( \|$)"` | セッションプロセスを見つける pgrep -f パターン。デフォルトは `claude` CLI(対話型・SDK起動とも)にマッチ |
+| `session_pattern` | `"((^\|/)claude( \|$)\|--sdk-url)"` | セッションプロセスを見つける pgrep -f パターン。`claude` CLI の名前 *または* `--sdk-url` フラグにマッチ(Linux はバージョン名バイナリでセッションが起動するため名前だけでは拾えない) |
 | `hot_temp_c` | `78` | あつがり顔になる CPU 温度（Linux のみ） |
 | `sweat_usage_pct` | `85` | 焦り顔になる 5時間枠の % |
 | `night_hours` | `[1, 7]` | この時間帯はおやすみ顔 |

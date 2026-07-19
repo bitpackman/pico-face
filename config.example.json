@@ -9,7 +9,7 @@
 
   "claude_usage": true,
   "claude_sessions": true,
-  "session_pattern": "(^|/)claude( |$)",
+  "session_pattern": "((^|/)claude( |$)|--sdk-url)",
   "credentials_path": "~/.claude/.credentials.json",
 
   "hot_temp_c": 78,
