@@ -69,7 +69,7 @@ launchctl load ~/Library/LaunchAgents/com.picoface.server.plist
 | `tasks_dir` | `null` | dir with `queue/ running/ done/ failed/` subdirs (finished tasks feed affection) |
 | `claude_usage` | `true` | show Claude usage windows (see note below) |
 | `claude_sessions` | `true` | classify Claude Code sessions by CPU activity |
-| `session_pattern` | `"--sdk-url"` | pgrep pattern that identifies session processes |
+| `session_pattern` | `"(^|/)claude( \|$)"` | pgrep -f pattern for session processes; the default matches the `claude` CLI (interactive and SDK-spawned) |
 | `hot_temp_c` | `78` | CPU temp for the overheating face (Linux only) |
 | `sweat_usage_pct` | `85` | 5-hour window % for the nervous face |
 | `night_hours` | `[1, 7]` | sleeping face between these local hours |

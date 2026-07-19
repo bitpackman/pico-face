@@ -3,17 +3,13 @@
   "lang": "en",
   "port": 8090,
 
-  "services": [
-    { "name": "my-agent",  "type": "systemd-user", "target": "my-agent.service" },
-    { "name": "my-daemon", "type": "launchd",      "target": "com.example.mydaemon" },
-    { "name": "ollama",    "type": "process",      "target": "ollama serve" }
-  ],
+  "services": [],
 
   "tasks_dir": null,
 
   "claude_usage": true,
   "claude_sessions": true,
-  "session_pattern": "--sdk-url",
+  "session_pattern": "(^|/)claude( |$)",
   "credentials_path": "~/.claude/.credentials.json",
 
   "hot_temp_c": 78,

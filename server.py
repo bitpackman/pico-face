@@ -36,7 +36,7 @@ DEFAULTS = {
     "tasks_dir": None,          # dir with queue/ running/ done/ failed/ subdirs, or null
     "claude_usage": True,       # show Claude usage windows (unofficial endpoint)
     "claude_sessions": True,    # classify Claude Code sessions by CPU activity
-    "session_pattern": "--sdk-url",
+    "session_pattern": "(^|/)claude( |$)",
     "credentials_path": "~/.claude/.credentials.json",
     "hot_temp_c": 78,
     "sweat_usage_pct": 85,
