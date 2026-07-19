@@ -9,7 +9,7 @@ face, not with a dashboard.
 
 [日本語 README](README.ja.md)
 
-![pico working](docs/shot-working.png)
+![pico in action](docs/pico.gif)
 
 | waiting for your reply ❗ | pet it 💗 |
 |---|---|

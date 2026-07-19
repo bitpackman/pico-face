@@ -8,7 +8,7 @@ pico-face は、バックグラウンドで AI エージェントが動いてい
 
 [English README](README.md)
 
-![pico working](docs/shot-working.png)
+![pico in action](docs/pico.gif)
 
 | おへんじ待ち ❗ | なでたとき 💗 |
 |---|---|
