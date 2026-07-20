@@ -40,6 +40,9 @@
     cursor: none;
   }
 
+  /* whole-face zoom wrapper — bumped up for more presence */
+  #stage { position: absolute; inset: 0; transform: scale(1.35); transform-origin: 50% 50%; }
+
   /* ---- face ---------------------------------------------------- */
   #face {
     position: absolute; inset: 0;
@@ -185,6 +188,50 @@
   @keyframes sneeze { 0% { transform: scale(1) } 30% { transform: scale(1.06,.92) } 50% { transform: scale(.9,1.1) translateY(-2.5vmin) } 70% { transform: scale(1.03,.97) } 100% { transform: scale(1) } }
   body.ev-daydream .eye { translate: 0 -2vmin; }
 
+  /* wink: one eye closed, cheeky little smile */
+  body.ev-wink #eyeL { height: 19vmin !important; border-radius: 45% 45% 48% 48% !important; }
+  body.ev-wink #eyeL::before, body.ev-wink #eyeL::after { opacity: .95 !important; }
+  body.ev-wink #eyeR { height: 2vmin !important; border-radius: 2vmin !important; }
+  body.ev-wink #eyeR::before, body.ev-wink #eyeR::after { opacity: 0 !important; }
+  body.ev-wink #mouth { width: 6vmin; height: 3vmin; }
+  /* nod: whole face nods "yes" */
+  body.ev-nod #face { animation: nod .6s ease-in-out 2; }
+  @keyframes nod { 0%,100% { transform: translateY(0) } 50% { transform: translateY(3vmin) } }
+  /* surprise: eyes pop wide & round, little "o" mouth */
+  body.ev-surprise .eye { height: 23vmin !important; border-radius: 50% !important; }
+  body.ev-surprise .eye::before { opacity: .95 !important; }
+  body.ev-surprise #mouth { width: 4.2vmin; height: 4.2vmin; border: .9vmin solid var(--eye); border-radius: 50%; }
+  /* stretch: face reaches up tall then settles */
+  body.ev-stretch #face { animation: stretchy 1.8s ease-in-out 1; }
+  @keyframes stretchy { 0%,100% { transform: scaleY(1) } 40% { transform: scaleY(1.14) translateY(-1.6vmin) } }
+
+  /* agape: mouth hangs open, wide round eyes */
+  body.ev-agape .eye { height: 23vmin !important; border-radius: 50% !important; }
+  body.ev-agape .eye::before { opacity: .95 !important; }
+  body.ev-agape #mouth { width: 6vmin; height: 7.5vmin; border: 1vmin solid var(--eye); border-radius: 50%; }
+  /* joy: big grin, happy ^^ eyes, hopping */
+  body.ev-joy .eye { height: 6vmin !important; border-radius: 8vmin 8vmin 2vmin 2vmin !important; }
+  body.ev-joy .eye::before, body.ev-joy .eye::after { opacity: 0 !important; }
+  body.ev-joy #mouth { width: 11vmin; height: 6vmin; border-radius: 0 0 11vmin 11vmin; }
+  body.ev-joy .cheek { opacity: 1 !important; }
+  body.ev-joy #face { animation: hop .9s ease-in-out infinite; }
+  /* giggle: quick happy bounce */
+  body.ev-giggle .eye { height: 5vmin !important; border-radius: 8vmin 8vmin 2vmin 2vmin !important; }
+  body.ev-giggle .eye::before, body.ev-giggle .eye::after { opacity: 0 !important; }
+  body.ev-giggle #mouth { width: 7vmin; height: 4vmin; }
+  body.ev-giggle .cheek { opacity: 1 !important; }
+  body.ev-giggle #face { animation: giggly .3s ease-in-out 4; }
+  @keyframes giggly { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-1.3vmin) } }
+  /* yawn: big sleepy stretch of the mouth */
+  body.ev-yawn .eye { height: 3vmin !important; }
+  body.ev-yawn .eye::before, body.ev-yawn .eye::after { opacity: 0 !important; }
+  body.ev-yawn #mouth { width: 6vmin; height: 8vmin; border: 1vmin solid var(--eye); border-radius: 50%; }
+  body.ev-yawn #face { animation: yawnbig 2.2s ease-in-out 1; }
+  @keyframes yawnbig { 0%,100% { transform: scale(1) } 40% { transform: scale(1.04) translateY(-1vmin) } }
+  /* talking: mouth flaps a little whenever a line is spoken (alive!) */
+  #mouth.talking { animation: talk .2s ease-in-out 3; }
+  @keyframes talk { 0%,100% { transform: translateX(-50%) scaleY(1) } 50% { transform: translateX(-50%) scaleY(.5) } }
+
   /* whim: daily personality tempo */
   body.w-mattari.idle #face, body.w-mattari.waiting #face { animation-duration: 7s; }
   body.w-harikiri.idle #face, body.w-harikiri.waiting #face { animation-duration: 2.2s; }
@@ -242,6 +289,12 @@
     #msg { top: calc(3% + env(safe-area-inset-top)); }
   }
 
+  /* mounted phone in landscape: fill the screen with a big face */
+  @media (orientation: landscape) and (max-height: 600px) {
+    #stage { transform: scale(2.2); }
+    #msg { top: 2%; }
+  }
+
   #snd {
     position: fixed; right: .9em; bottom: 3.2em; z-index: 30;
     background: none; border: none; font-size: 1.3em;
@@ -251,6 +304,7 @@
 </head>
 <body class="idle">
 
+<div id="stage">
 <div id="face">
   <div class="eye" id="eyeL"><div class="heartshape"></div></div>
   <div class="eye" id="eyeR"><div class="heartshape"></div></div>
@@ -262,6 +316,7 @@
 <div id="sweatdrop2"></div>
 <div id="zzz">z z Z</div>
 <div id="notice">❗</div>
+</div>
 <div id="dim"></div>
 
 <div id="msg"></div>
@@ -274,18 +329,18 @@
 const I18N = {
   ja: {
     msg: {
-      idle: ["ひまです… おしごとください", "ぼーっとしてます…", "なにかおてつだい、ありますか？", "きょうもへいわです", "ふんふんふ〜ん♪"],
-      working: ["がんばってます！", "カタカタカタ…", "しゅうちゅう中…！", "うでのみせどころです！"],
-      sweat: ["枠がもうすぐ上限…！", "ちょっとつかいすぎかも…！"],
+      idle: ["ひまです… おしごとください", "ぼーっとしてます…", "なにかおてつだい、ありますか？", "きょうもへいわです", "ふんふんふ〜ん♪", "おそらがきれいだなぁ", "ぷらぷら〜", "つぎは なにしようかな"],
+      working: ["がんばってます！", "カタカタカタ…", "しゅうちゅう中…！", "うでのみせどころです！", "あとちょっと…！", "ここがふんばりどころ！"],
+      sweat: ["枠がもうすぐ上限…！", "ちょっとつかいすぎかも…！", "ふぅ、いそがしくなってきた…！"],
       trouble: ["たすけて！サービスが落ちてます"],
       sleeping: ["おやすみなさい……", "すぅ…… すぅ……", "むにゃ…"],
-      hot: ["あつい…！とけちゃう〜"],
-      proud: ["おしごと完了！えっへん", "どうだ！やりました！", "ほめてほめて！"],
-      heart: ["えへへ、だいすき！", "わ〜い！", "もっとなでて！"],
-      waiting: ["おへんじまってます！", "ねぇねぇ、みてみて！", "できたとおもうんだけど、どうかな？"],
+      hot: ["あつい…！とけちゃう〜", "せんぷうき ほしい…"],
+      proud: ["おしごと完了！えっへん", "どうだ！やりました！", "ほめてほめて！", "われながら いいできばえ！"],
+      heart: ["えへへ、だいすき！", "わ〜い！", "もっとなでて！", "きゅん…♡", "うれしくて とろけそう"],
+      waiting: ["おへんじまってます！", "ねぇねぇ、みてみて！", "できたとおもうんだけど、どうかな？", "みてくれたら うれしいな"],
     },
     rare: {
-      idle: ["…きょうもいっしょにがんばろうね", "（じつは あなたのこと みてました）"],
+      idle: ["…きょうもいっしょにがんばろうね", "（じつは あなたのこと みてました）", "ほしぞら、みにいきたいね", "ぼく、やくにたててるかな…？"],
       working: ["これがおわったら ほめてくださいね", "むずかしいけど まけないぞ…！"],
       heart: ["ずっといっしょにいようね"],
       waiting: ["はやくみてほしいなぁ…そわそわ"],
@@ -307,21 +362,23 @@ const I18N = {
     watching: "👀 そばにいる", away: "…おるすばん",
     connectErr: "status server に接続できません",
     sigh: "ふぅ…", sneezeMsg: "……くしゅんっ！", dream: "……♪", ehehe: "……えへへ", chira: "……（ちらっ）",
+    wink: "ふふっ、ないしょ♪", surprise: "わっ、びっくりした！", stretch: "ん〜〜っ、のびのび",
+    agape: "……ぽかーん", joy: "わーい！！うれしいなっ♪", giggle: "ふふっ、あはは♪", yawn: "ふあぁ…ねむいなぁ",
   },
   en: {
     msg: {
-      idle: ["I'm bored... got any work for me?", "just chilling...", "anything I can help with?", "all quiet today", "hmm hmm hm~ ♪"],
-      working: ["working hard!", "tak tak tak...", "focusing...!", "watch me go!"],
-      sweat: ["usage window almost full...!", "we might be overdoing it...!"],
+      idle: ["I'm bored... got any work for me?", "just chilling...", "anything I can help with?", "all quiet today", "hmm hmm hm~ ♪", "the sky looks pretty~", "wander wander~", "what should I do next?"],
+      working: ["working hard!", "tak tak tak...", "focusing...!", "watch me go!", "almost there...!", "this is the crucial part!"],
+      sweat: ["usage window almost full...!", "we might be overdoing it...!", "phew, getting busy...!"],
       trouble: ["help! a service is down"],
       sleeping: ["good night......", "zzz... zzz...", "mnya..."],
-      hot: ["so hot...! I'm melting~"],
-      proud: ["task done! ta-da!", "nailed it!", "praise me please!"],
-      heart: ["hehe, I like you!", "yay!", "pet me more!"],
-      waiting: ["waiting for your reply!", "hey, come look!", "I think it's done — what do you say?"],
+      hot: ["so hot...! I'm melting~", "I want a fan..."],
+      proud: ["task done! ta-da!", "nailed it!", "praise me please!", "if I say so myself — great work!"],
+      heart: ["hehe, I like you!", "yay!", "pet me more!", "my heart's fluttering...♡", "so happy I could melt"],
+      waiting: ["waiting for your reply!", "hey, come look!", "I think it's done — what do you say?", "I'd be happy if you took a look"],
     },
     rare: {
-      idle: ["...let's do our best together today", "(I was secretly watching you)"],
+      idle: ["...let's do our best together today", "(I was secretly watching you)", "let's go stargazing sometime", "am I being helpful...?"],
       working: ["praise me when this is done, okay?", "it's hard but I won't give up...!"],
       heart: ["let's stay together forever"],
       waiting: ["I really want you to see this... fidget fidget"],
@@ -343,6 +400,8 @@ const I18N = {
     watching: "👀 with you", away: "...away",
     connectErr: "cannot reach status server",
     sigh: "phew...", sneezeMsg: "...achoo!", dream: "...♪", ehehe: "...hehe", chira: "...(glance)",
+    wink: "hehe, secret ♪", surprise: "whoa, you surprised me!", stretch: "nnngh~ stretch",
+    agape: "...wha, ooh...", joy: "yaaay!! I'm so happy ♪", giggle: "hehe, ahaha ♪", yawn: "yaawn... sleepy...",
   },
 };
 let UI = { name: "pico", lang: "en" };
@@ -371,6 +430,10 @@ const sndPet     = () => { beep(880, .07); beep(1318, .1, .07); };
 const sndLevelup = () => [523, 659, 784, 1047, 1318].forEach((f, i) => beep(f, .12, i * .1, .1));
 const sndOkaeri  = () => { beep(659, .1); beep(880, .1, .12); beep(1047, .18, .24); };
 const sndSneeze  = () => beep(220, .12, 0, .06);
+const sndWink    = () => { beep(1046, .07); beep(1568, .09, .07); };
+const sndSurprise= () => { beep(1568, .05); beep(784, .11, .06); };
+const sndJoy     = () => [784, 988, 1318, 1568].forEach((f, i) => beep(f, .1, i * .08, .09));
+const sndGiggle  = () => { beep(1318, .05); beep(1046, .05, .06); beep(1568, .06, .12); };
 
 const sndBtn = document.querySelector("#snd");
 sndBtn.textContent = soundOn ? "🔊" : "🔇";
@@ -400,13 +463,36 @@ let tempMsgUntil = 0;
 function tempMsg(text, ms = 2200) {
   tempMsgUntil = Date.now() + ms;
   document.getElementById("msg").textContent = text;
+  lastMsgText = text; sayMouth(text);
   setTimeout(render, ms + 50);
+}
+
+// mouth-flap: move the mouth each time a line is spoken (feels alive)
+function sayMouth(text) {
+  if (!text) return;
+  const m = document.getElementById("mouth");
+  m.classList.remove("talking"); void m.offsetWidth; m.classList.add("talking");
+  clearTimeout(sayMouth._t);
+  sayMouth._t = setTimeout(() => m.classList.remove("talking"), 700);
+}
+
+function burstHearts(n) {
+  for (let i = 0; i < n; i++)
+    setTimeout(() => floatHeart(innerWidth * (0.3 + Math.random() * 0.4),
+      innerHeight * (0.35 + Math.random() * 0.2), "♥"), i * 120);
+}
+
+// look around: sweep the eyes slowly left/right
+function lookAround() {
+  [-4, 4, -2.5, 0].forEach((dx, i) => setTimeout(() =>
+    document.querySelectorAll(".eye").forEach(e => e.style.translate = `${dx}vmin 0`), i * 450));
 }
 
 let mood = "idle";
 let afLevel = 1;
 let whim = null;
 let evClass = null;
+let lastMsgText = "";  // mouth-flap trigger: move the mouth when the line changes
 
 function setFace(m) {
   mood = m;
@@ -456,17 +542,29 @@ function runEvent(cls, ms, after) {
 
 function microEvent() {
   if (tapMood || mood === "sleeping" || mood === "trouble") return;
-  const pool = ["glance", "glance", "wiggle", "sigh"];
-  if (whim === "ochame") pool.push("sneeze", "wiggle", "sneeze");
-  if (whim === "amaenbo" && afLevel >= 3) pool.push("love", "love");
-  if (whim === "tereya") pool.push("shy");
-  if (mood === "idle") pool.push("daydream");
+  const pool = ["glance", "glance", "lookaround", "wiggle", "sigh", "wink", "nod", "stretch", "giggle"];
+  if (whim === "ochame") pool.push("sneeze", "wink", "surprise", "agape", "giggle");
+  if (whim === "amaenbo" && afLevel >= 3) pool.push("love", "love", "joy");
+  if (whim === "tereya") pool.push("shy", "wink");
+  if (whim === "harikiri") pool.push("joy", "nod", "giggle");
+  if (mood === "idle") pool.push("daydream", "surprise", "stretch", "yawn", "agape", "lookaround");
+  if (mood === "working") pool.push("nod", "nod", "glance");
+  if (mood === "proud" || mood === "heart") pool.push("joy", "giggle");
   const ev = pool[Math.floor(Math.random() * pool.length)];
   if (ev === "glance") glance();
+  else if (ev === "lookaround") lookAround();
   else if (ev === "wiggle") runEvent("ev-wiggle", 1100);
   else if (ev === "sigh") { runEvent("ev-sigh", 2100); tempMsg(T.sigh); }
   else if (ev === "sneeze") { runEvent("ev-sneeze", 900); tempMsg(T.sneezeMsg); sndSneeze(); }
   else if (ev === "daydream") { runEvent("ev-daydream", 2600); tempMsg(T.dream); }
+  else if (ev === "wink") { runEvent("ev-wink", 1200); tempMsg(T.wink); sndWink(); }
+  else if (ev === "nod") { runEvent("ev-nod", 1300); }
+  else if (ev === "surprise") { runEvent("ev-surprise", 950); tempMsg(T.surprise); sndSurprise(); }
+  else if (ev === "stretch") { runEvent("ev-stretch", 1800); tempMsg(T.stretch); }
+  else if (ev === "agape") { runEvent("ev-agape", 1900); tempMsg(T.agape); }
+  else if (ev === "joy") { runEvent("ev-joy", 2200); tempMsg(T.joy); burstHearts(5); sndJoy(); }
+  else if (ev === "giggle") { runEvent("ev-giggle", 1300); tempMsg(T.giggle); sndGiggle(); }
+  else if (ev === "yawn") { runEvent("ev-yawn", 2300); tempMsg(T.yawn); }
   else if (ev === "love") {
     floatHeart(innerWidth * (0.35 + Math.random() * 0.3), innerHeight * 0.35, "♥");
     tempMsg(T.ehehe);
@@ -475,9 +573,9 @@ function microEvent() {
 }
 
 function evDelay() {
-  const base = whim === "harikiri" ? 8000 : whim === "mattari" ? 20000
-             : whim === "ochame" ? 9000 : 13000;
-  return base * (0.6 + Math.random() * 0.9);
+  const base = whim === "harikiri" ? 6000 : whim === "mattari" ? 14000
+             : whim === "ochame" ? 7000 : 10000;
+  return base * (0.55 + Math.random() * 1.0);
 }
 (function loopEvents() { setTimeout(() => { microEvent(); loopEvents(); }, evDelay()); })();
 
@@ -570,6 +668,7 @@ function render() {
   else if (m === "heart" && whim === "tereya")
     msg = T.tereyaHeart[Math.floor(Math.random() * T.tereyaHeart.length)];
   document.getElementById("msg").textContent = msg;
+  if (msg !== lastMsgText) { lastMsgText = msg; sayMouth(msg); }
   strip(s);
 }
 
